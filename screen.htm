@@ -1,0 +1,345 @@
+﻿
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Screen Test</title>
+<style type="text/css">
+html,body {
+	margin: 0;
+	padding: 0;
+	height: 100%;
+	font-size: 12px;
+	text-align: center;
+	overflow: hidden;
+}
+
+div {
+	width: 100%;
+	height: 100%;
+}
+
+.txt {
+	top: 50%;
+	left: 0;
+	width: 100%;
+	height: 60px;
+	line-height: 30px;
+	position: absolute;
+	margin-top: -30px;
+	font-size: 30px;
+	width: 100%;
+}
+
+.floatlt {
+	float: left;
+}
+
+.floatrt {
+	float: right;
+}
+
+.clearfix:after {
+	content: ' ';
+	clear: both;
+	display: block;
+	font-size: 0;
+	line-height: 0;
+	width: 0;
+	height: 0;
+	visibility: hidden;
+}
+
+.clearfix {
+	display: inline-block;
+}
+
+.clearfix {
+	display: block;
+}
+</style>
+<script>
+	function drawGrid(len) {
+		var arr = [];
+		var per = 100 / len;
+		arr.push('<div class="clearfix">');
+		for ( var i = 0; i < len; i++) {
+			arr.push('<div class="clearfix" style="height:' + per + '%;">');
+			for ( var j = 0; j < len; j++) {
+				var c = Math.round(0xff * (i + j) / (2 * len - 2));
+				c = c.toString(16);
+				if (c.length < 2) {
+					c = "0" + c;
+				}
+				c = "#" + c + c + c;
+				arr.push('<div style="background-color:' + c + ';width:' + per + '%;" class="floatlt"></div>');
+			}
+			arr.push('</div>');
+		}
+		arr.push('</div>');
+		return arr.join("");
+	}
+	function toColorHex(c) {
+		var len = c.length;
+		var num = 6 - len;
+		if (num > 0) {
+			c = (Math.pow(10, num).toString().substr(1)) + c;
+		}
+		return "#" + c;
+	}
+	function getCW(c, w) {
+		c = c.toString(16);
+		c = toColorHex(c);
+		return '<div style="background-color:' + c + ';width:' + w + '%;" class="floatlt"></div>';
+	}
+	function getCH(c, h) {
+		c = c.toString(16);
+		c = toColorHex(c);
+		return '<div style="background-color:' + c + ';height:' + h + '%;" class="floatlt"></div>';
+	}
+	function drawColorV() {
+		var len = 0xff;
+		var arr = [];
+		var wper = 100 / 6;
+		var hper = 100 / 16;
+		arr.push('<div class="clearfix">');
+		for ( var i = 0; i <= 0xff; i = i + 0x11) {
+			arr.push('<div class="clearfix" style="height:' + hper + '%;">');
+			//
+			var c = 0xff0000 + i * 0x100;
+			arr.push(getCW(c, wper));
+			//
+			var c = (0xff - i) * 0x10000 + 0xff00;
+			arr.push(getCW(c, wper));
+			//
+			var c = 0x00ff00 + i;
+			arr.push(getCW(c, wper));
+			//
+			var c = (0xff - i) * 0x100 + 0xff;
+			arr.push(getCW(c, wper));
+			//
+			var c = 0xff + i * 0x10000;
+			arr.push(getCW(c, wper));
+			//
+			var c = 0xff - i + 0xff0000;
+			arr.push(getCW(c, wper));
+			//
+			arr.push('</div>');
+		}
+		arr.push('</div>');
+		return arr.join("");
+	}
+	function drawColorH() {
+		var len = 0xff;
+		var hper = 100 / 6;
+		var wper = 100 / 16;
+		var arr = [[], [], [], [], [], []];
+		for ( var i = 0; i <= 0xff; i = i + 0x11) {
+			var c = 0xff0000 + i * 0x100;
+			arr[0].push(getCW(c, wper));
+			//
+			var c = (0xff - i) * 0x10000 + 0xff00;
+			arr[1].push(getCW(c, wper));
+			//
+			var c = 0x00ff00 + i;
+			arr[2].push(getCW(c, wper));
+			//
+			var c = (0xff - i) * 0x100 + 0xff;
+			arr[3].push(getCW(c, wper));
+			//
+			var c = 0xff + i * 0x10000;
+			arr[4].push(getCW(c, wper));
+			//
+			var c = 0xff - i + 0xff0000;
+			arr[5].push(getCW(c, wper));
+		}
+		for ( var i = 0; i < arr.length; i++) {
+			arr[i].unshift('<div class="clearfix" style="height:' + hper + '%;">');
+			arr[i].push('</div>');
+			arr[i] = arr[i].join("");
+		}
+		arr.unshift('<div class="clearfix">');
+		arr.push('</div>');
+		return arr.join("");
+	}
+	function drawColor(C) {
+		var len = 0xff;
+		var arr = [];
+		var wper = 100 / 31;
+		var map = {
+			R : {
+				c : 0xff0000,
+				a1 : 0x100,
+				a2 : 0x1,
+				r1 : 0x10000,
+				r2 : 0
+			},
+			G : {
+				c : 0x00ff00,
+				a1 : 0x10000,
+				a2 : 0x1,
+				r1 : 0x100,
+				r2 : 0
+			},
+			B : {
+				c : 0x0000ff,
+				a1 : 0x10000,
+				a2 : 0x100,
+				r1 : 0x1,
+				r2 : 0
+			},
+			C : {
+				c : 0x00ffff,
+				a1 : 0x10000,
+				a2 : 0,
+				r1 : 0x100,
+				r2 : 0x1
+			},
+			M : {
+				c : 0xff00ff,
+				a1 : 0x100,
+				a2 : 0,
+				r1 : 0x10000,
+				r2 : 0x1
+			},
+			Y : {
+				c : 0xffff00,
+				a1 : 0x1,
+				a2 : 0,
+				r1 : 0x10000,
+				r2 : 0x100
+			}
+		};
+		for ( var i = 0; i <= 0xff; i = i + 0x11) {
+			var m = map[C];
+			var c = m.c;
+			if (i) {
+				arr.unshift(getCW(c + i * m.a1 + i * m.a2, wper));
+				arr.push(getCW(c - i * m.r1 - i * m.r2, wper));
+			} else {
+				arr.push(getCW(c, wper));
+			}
+		}
+		arr.unshift('<div class="clearfix">');
+		arr.push('</div>');
+		return arr.join("");
+	}
+	function drawGrayV() {
+		var len = 0xff;
+		var arr = [];
+		var hper = 100 / 16;
+		arr.push('<div class="clearfix">');
+		for ( var i = 0; i <= 0xff; i = i + 0x11) {
+			var c = 0xffffff - (i * 0x10000 + i * 0x100 + i);
+			arr.push(getCH(c, hper));
+		}
+		arr.push('</div>');
+		return arr.join("");
+	}
+	function drawGrayH() {
+		var len = 0xff;
+		var arr = [];
+		var wper = 100 / 16;
+		arr.push('<div class="clearfix">');
+		for ( var i = 0; i <= 0xff; i = i + 0x11) {
+			var c = 0xffffff - (i * 0x10000 + i * 0x100 + i);
+			arr.push(getCW(c, wper));
+		}
+		arr.push('</div>');
+		return arr.join("");
+	}
+	var index = 0;
+	var task = [function(c) {
+		c.innerHTML = '<div class="txt"><p>屏幕色阶，灰阶，亮点，暗点，色点测试</p><p>按F11全屏，点击左键继续，右键返回</p></div>';
+		c.title = "如果测试中有错位显示，请更新使用最新版浏览器";
+	}, function(c) {
+		c.innerHTML = drawColorV();
+		c.title = index + ", 竖向RGB-CMY环16色阶测试";
+	}, function(c) {
+		c.innerHTML = drawColorH();
+		c.title = index + ", 横向RGB-CMY环16色阶测试";
+	}, function(c) {
+		c.innerHTML = drawColor("R");
+		c.title = index + ", R阶测试";
+	}, function(c) {
+		c.innerHTML = drawColor("G");
+		c.title = index + ", G阶测试";
+	}, function(c) {
+		c.innerHTML = drawColor("B");
+		c.title = index + ", B阶测试";
+	}, function(c) {
+		c.innerHTML = drawColor("C");
+		c.title = index + ", C阶测试";
+	}, function(c) {
+		c.innerHTML = drawColor("M");
+		c.title = index + ", M阶测试";
+	}, function(c) {
+		c.innerHTML = drawColor("Y");
+		c.title = index + ", Y阶测试";
+	}, function(c) {
+		c.innerHTML = drawGrayV();
+		c.title = index + ", 竖向16灰阶测试";
+	}, function(c) {
+		c.innerHTML = drawGrayH();
+		c.title = index + ", 横向16灰阶测试";
+	}, function(c) {
+		c.innerHTML = drawGrid(16);
+		c.title = index + ", 256灰阶测试";
+	}, function(c) {
+		c.innerHTML = drawGrid(32);
+		c.title = index + ", 1024灰阶测试";
+	}, function(c) {
+		c.innerHTML = '<div style="background-color:#000000;"></div>';
+		c.title = index + ", 纯黑亮点色点测试";
+	}, function(c) {
+		c.innerHTML = '<div style="background-color:#ffffff;"></div>';
+		c.title = index + ", 纯白暗点色点测试";
+	}, function(c) {
+		c.innerHTML = '<div style="background-color:#ff0000;"></div>';
+		c.title = index + ", 纯红R测试";
+	}, function(c) {
+		c.innerHTML = '<div style="background-color:#00ff00;"></div>';
+		c.title = index + ", 纯绿G测试";
+	}, function(c) {
+		c.innerHTML = '<div style="background-color:#0000ff;"></div>';
+		c.title = index + ", 纯蓝B测试";
+	}, function(c) {
+		c.innerHTML = '<div style="background-color:#00ffff;"></div>';
+		c.title = index + ", 纯青C测试";
+	}, function(c) {
+		c.innerHTML = '<div style="background-color:#ff00ff;"></div>';
+		c.title = index + ", 纯洋M测试";
+	}, function(c) {
+		c.innerHTML = '<div style="background-color:#ffff00;"></div>';
+		c.title = index + ", 纯黄Y测试";
+	}];
+	function next() {
+		var c = document.getElementById("container");
+		var fun = task[index];
+		if (fun) {
+			fun(c);
+			index++;
+		} else {
+			c.innerHTML = '<div class="txt"><p>测试完成，点击返回</p><p><a href="http://weibo.com/kevinzqm" target="_blank">@KevinMark3</a></p></div>';
+			c.title = "";
+			index = 0;
+		}
+	}
+	function prev() {
+		if (index == 1) {
+			return false;
+		}
+		if (index == 0) {
+			index = task.length - 1;
+		} else {
+			index -= 2;
+		}
+		next();
+		return false;
+	}
+</script>
+</head>
+<body oncontextmenu="return prev();" onclick="next();" onload="next();" ontouchend="next();">
+	<div id="container"></div>
+</body>
+</html>
